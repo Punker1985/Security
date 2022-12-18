@@ -12,48 +12,53 @@ public class Main {
     public static void main(String[] args) throws IOException {
         List<List<Event>> testList = readInputFile();
         for (List<Event> eventList : testList) {
-            int countSecurityNow = 0;
-            int noLowIntervalStartTime = 0;
-            boolean flag = true;
-            boolean noLowIntervalStart =false;
-            List<Security> noLowIntervalList = new ArrayList<>();
-            for (int i = 0; i < eventList.size() - 1; i++) {
-                Event event = eventList.get(i);
-                if (event.getType() == -1) {
-                    countSecurityNow++;
-                } else {
-                    countSecurityNow--;
-                }
-                if (event.getTime() != eventList.get(i + 1).getTime()) {
-                    if (countSecurityNow == 0) {
-                        flag = false;
-                    }
-                    if ((countSecurityNow > 1) && !noLowIntervalStart) {
-                        noLowIntervalStart = true;
-                        noLowIntervalStartTime = event.getTime();
-                    }
-                    if ((countSecurityNow == 1) && noLowIntervalStart) {
-                        noLowIntervalList.add(new Security(noLowIntervalStartTime, event.getTime()));
-                        noLowIntervalStart = false;
-                    }
-                }
-            }
-            if ((eventList.get(eventList.size() - 1).getTime() < 10000) || (eventList.get(0).getTime() != 1)) {
-                flag = false;
-            }
-            for (Security noLowInterval : noLowIntervalList) {
-                for (Security security : securityList) {
-                    if (noLowInterval.contains(security)) {
-                        flag = false;
-                    }
-                }
-            }
+            boolean flag = isAccepted(eventList);
             if (flag) {
                 System.out.println("Accepted");
             } else {
                 System.out.println("Wrong Answer");
             }
         }
+    }
+
+    private static boolean isAccepted(List<Event> eventList) {
+        int countSecurityNow = 0;
+        int noLowIntervalStartTime = 0;
+        boolean flag = true;
+        boolean noLowIntervalStart =false;
+        List<Security> noLowIntervalList = new ArrayList<>();
+        for (int i = 0; i < eventList.size() - 1; i++) {
+            Event event = eventList.get(i);
+            if (event.getType() == -1) {
+                countSecurityNow++;
+            } else {
+                countSecurityNow--;
+            }
+            if ((event.getTime() != eventList.get(i + 1).getTime()) || ((i + 1) == eventList.size() -1 )) {
+                if (countSecurityNow == 0) {
+                    flag = false;
+                }
+                if ((countSecurityNow > 1) && !noLowIntervalStart) {
+                    noLowIntervalStart = true;
+                    noLowIntervalStartTime = event.getTime();
+                }
+                if ((countSecurityNow == 1) && noLowIntervalStart) {
+                    noLowIntervalList.add(new Security(noLowIntervalStartTime, event.getTime()));
+                    noLowIntervalStart = false;
+                }
+            }
+        }
+        if ((eventList.get(eventList.size() - 1).getTime() < 10000) || (eventList.get(0).getTime() != 1)) {
+            flag = false;
+        }
+        for (Security noLowInterval : noLowIntervalList) {
+            for (Security security : securityList) {
+                if (noLowInterval.contains(security)) {
+                    flag = false;
+                }
+            }
+        }
+        return flag;
     }
 
     static List<List<Event>> readInputFile() throws IOException {
